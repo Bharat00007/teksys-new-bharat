@@ -2,7 +2,7 @@ import { Link, NavLink } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Menu, X, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import logo from "@/assets/teksys-logo.png";
+import logo from "@/assets/teksys1.png";
 import { NAV, SITE } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
@@ -28,13 +28,10 @@ export function Navbar() {
     >
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between gap-6 px-4 sm:px-6 lg:px-8">
         <Link to="/" className="flex flex-col leading-none" aria-label={SITE.name}>
-          <span className="font-display text-3xl font-extrabold tracking-tight text-primary">
-            TEKSYS<sup className="ml-0.5 text-[10px] font-bold">®</sup>
-          </span>
+          <img src={logo} alt="TEKSYS logo" className="h-10 w-30 object-contain" />
           <span className="mt-1 text-[10px] font-semibold tracking-[0.18em] text-primary/80">
             INNOVATE | TRAIN | TRANSFORM
           </span>
-          <img src={logo} alt="" className="hidden" width={1} height={1} aria-hidden />
         </Link>
 
         <nav className="hidden items-center gap-8 md:flex" aria-label="Primary">
