@@ -81,18 +81,20 @@ function Hero() {
             img={collageGan}
             eyebrow="GaN Technology"
             title="Consulting"
-            position="top"
+            position="bottom"
             className="aspect-[4/3]"
           />
           <HeroCard
             img={collageMmic}
-            title="fabless & MMIC design and Development"
-            caption="Semiconductor Fabless & MMIC Design and Development"
+            title="Fabless & MMIC design and Development"
+            position="bottom"
+            //caption="Semiconductor Fabless & MMIC Design and Development"
             className="aspect-[4/3]"
           />
           <HeroCard
             img={collageTraining}
-            title="semiconductor skill training on GaN and SiC +"
+            title="Semiconductor Skill Training on GaN and SiC "
+            position="bottom"
             className="col-span-2 aspect-[16/7]"
           />
         </motion.div>
@@ -184,7 +186,7 @@ function ServicesPreview() {
     <Section>
       <SectionTitle
         eyebrow="What we do"
-        title={<>End-to-end semiconductor &<br className="hidden sm:block" /> deep-tech engineering</>}
+        title={<>End-to-End Semiconductor &<br className="hidden sm:block" /> Deep-Tech Engineering</>}
         description="From GaN device consulting to MMIC tape-out and workforce training — we partner with engineering teams to deliver advanced technology programs."
       />
       <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -399,12 +401,12 @@ function Partners() {
           {items.map((p) => (
             <div
               key={p.name}
-              className="flex h-20 w-full max-w-[260px] items-center justify-center rounded-xl bg-white p-4 shadow-sm ring-1 ring-border"
+              className="flex h-24 w-full max-w-[320px] items-center justify-center rounded-xl bg-white p-6 shadow-sm ring-1 ring-border"
             >
               <img
                 src={p.img}
                 alt={p.name}
-                className="max-h-14 w-auto object-contain"
+                className="max-h-20 w-auto object-contain"
                 loading="lazy"
               />
             </div>

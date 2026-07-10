@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { Link } from "react-router-dom";
 import { Mail, Phone, MapPin, Linkedin, Twitter, Youtube } from "lucide-react";
-import logo from "@/assets/teksys-logo.png";
+import logo from "@/assets/teksys1.png";
 import { NAV, SERVICES, SITE } from "@/lib/site";
 
 export function Footer() {

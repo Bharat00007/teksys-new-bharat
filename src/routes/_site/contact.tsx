@@ -65,7 +65,7 @@ function ContactPage() {
               <div className="relative h-64 w-full">
                 <iframe
                   title="TEKSYS office location"
-                  src="https://www.google.com/maps?q=Bengaluru%2C+India&output=embed"
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3889.0346179717317!2d79.03856632345016!3d21.17463414233945!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x82f64feeb02c222f%3A0x7e18f3714b914623!2sTeksys%20Services!5e0!3m2!1sen!2sin!4v1"
                   className="absolute inset-0 h-full w-full"
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
