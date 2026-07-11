@@ -1,5 +1,6 @@
 import "./lib/error-capture";
 import { handleRegistrationAPI } from "./lib/registration.api";
+import { handleDiagnosticsAPI } from "./lib/diagnostics.api";
 
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
@@ -42,6 +43,19 @@ export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     try {
       const url = new URL(request.url);
+      // Diagnostics endpoint (protected by DIAG_KEY env) for integrated SMTP checks
+      if (request.method === "POST" && url.pathname === "/api/diagnostics/smtp") {
+        try {
+          return await handleDiagnosticsAPI(request);
+        } catch (err: any) {
+          console.error('[SERVER] Uncaught error in /api/diagnostics/smtp handler:', err);
+          return new Response(JSON.stringify({ success: false, message: err?.message || 'Internal server error' }), {
+            status: 500,
+            headers: { "content-type": "application/json" },
+          });
+        }
+      }
+
       if (request.method === "POST" && url.pathname === "/api/registration") {
         try {
           return await handleRegistrationAPI(request);
