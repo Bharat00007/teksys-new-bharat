@@ -43,7 +43,15 @@ export default {
     try {
       const url = new URL(request.url);
       if (request.method === "POST" && url.pathname === "/api/registration") {
-        return await handleRegistrationAPI(request);
+        try {
+          return await handleRegistrationAPI(request);
+        } catch (err: any) {
+          console.error('[SERVER] Uncaught error in /api/registration handler:', err);
+          return new Response(JSON.stringify({ success: false, message: err?.message || 'Internal server error' }), {
+            status: 500,
+            headers: { "content-type": "application/json" },
+          });
+        }
       }
       
       const handler = await getServerEntry();
