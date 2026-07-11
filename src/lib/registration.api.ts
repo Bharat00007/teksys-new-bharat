@@ -1,5 +1,7 @@
 import { z } from "zod";
 import { sendEmail } from "./mailer";
+import { promises as fs } from "fs";
+import path from "path";
 
 const RegistrationSchema = z.object({
   whoAreYou: z.enum(["Student", "Faculty", "Organization"], { required_error: "Please select who you are" }),
@@ -16,9 +18,30 @@ const RegistrationSchema = z.object({
 
 function esc(s: string) {
   if (!s) return "";
-  return s.replace(/[&<>"']/g, (c) =>
+  return s.replace(/[&<>\"']/g, (c) =>
     ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!,
   );
+}
+
+const DATA_DIR = process.env.FAILED_REG_DIR ? path.resolve(process.cwd(), process.env.FAILED_REG_DIR) : path.resolve(process.cwd(), "data");
+const FAILED_FILE = path.join(DATA_DIR, "failed-registrations.json");
+
+async function persistFailedRegistration(entry: any) {
+  try {
+    await fs.mkdir(DATA_DIR, { recursive: true });
+    let list: any[] = [];
+    try {
+      const txt = await fs.readFile(FAILED_FILE, "utf-8");
+      list = JSON.parse(txt || "[]");
+    } catch (e) {
+      list = [];
+    }
+    list.push(entry);
+    await fs.writeFile(FAILED_FILE, JSON.stringify(list, null, 2), "utf-8");
+    console.log("[REGISTRATION API] Persisted failed registration to", FAILED_FILE);
+  } catch (err) {
+    console.error("[REGISTRATION API] Failed to persist registration:", err);
+  }
 }
 
 export async function handleRegistrationAPI(request: Request): Promise<Response> {
@@ -128,9 +151,15 @@ Remarks: ${data.remarks || "No remarks."}
 
     if (!result.success) {
       console.error("[REGISTRATION API] ❌ Email sending failed:", result.error);
+      // persist registration so we don't lose it
+      try {
+        await persistFailedRegistration({ timestamp: new Date().toISOString(), data, error: result.error });
+      } catch (e) {
+        console.error('[REGISTRATION API] Persist failed registration error:', e);
+      }
       return new Response(JSON.stringify({ 
         success: false, 
-        message: result.error || "Failed to send email" 
+        message: result.error || "Failed to send email; registration saved." 
       }), {
         status: 500,
         headers: { "Content-Type": "application/json" }
