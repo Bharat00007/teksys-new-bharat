@@ -6,6 +6,7 @@ import Contact from "./routes/_site/contact";
 import Services from "./routes/_site/services";
 import Legal from "./routes/_site/legal";
 import Training from "./routes/_site/training";
+import SemiconductorSkillTraining from "./routes/_site/semiconductor-skill-training";
 import NotFound from "./routes/NotFound";
 import { reportLovableError } from "./lib/lovable-error-reporting";
 
@@ -20,6 +21,7 @@ function App() {
           <Route path="services" element={<Services />} />
           <Route path="legal" element={<Legal />} />
           <Route path="training" element={<Training />} />
+          <Route path="semiconductor-skill-training" element={<SemiconductorSkillTraining />} />
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>
