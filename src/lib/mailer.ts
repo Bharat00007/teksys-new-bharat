@@ -5,7 +5,13 @@ type MailOptions = {
   to: string | string[];
   subject: string;
   html: string;
+  text?: string;
   replyTo?: string;
+};
+
+type SendResult = {
+  success: boolean;
+  error?: string;
 };
 
 let transporter: ReturnType<typeof nodemailer.createTransport> | null = null;
@@ -15,57 +21,81 @@ function getTransporter() {
     return transporter;
   }
 
-  const smtpServer = process.env.SMTP_SERVER;
+  const smtpServer = process.env.SMTP_HOST || process.env.SMTP_SERVER;
   const smtpPort = process.env.SMTP_PORT;
-  const emailAddress = process.env.EMAIL_ADDRESS;
-  const emailPassword = process.env.EMAIL_PASSWORD;
+  const emailAddress = process.env.SMTP_USER || process.env.EMAIL_ADDRESS;
+  const emailPassword = process.env.SMTP_PASS || process.env.EMAIL_PASSWORD;
+  const isSecure = process.env.SMTP_SECURE === "true" || parseInt(smtpPort || "", 10) === 465;
 
   if (!smtpServer || !smtpPort || !emailAddress || !emailPassword) {
-    throw new Error(
-      "SMTP configuration missing. Please set SMTP_SERVER, SMTP_PORT, EMAIL_ADDRESS, and EMAIL_PASSWORD environment variables."
-    );
+    throw new Error("SMTP configuration missing.");
   }
 
   transporter = nodemailer.createTransport({
     host: smtpServer,
     port: parseInt(smtpPort, 10),
-    secure: false, // Use TLS (STARTTLS) instead of SSL
+    secure: isSecure,
     auth: {
       user: emailAddress,
       pass: emailPassword,
+    },
+    tls: {
+      rejectUnauthorized: false,
     },
   });
 
   return transporter;
 }
 
-export async function sendEmail(options: MailOptions): Promise<boolean> {
+export async function sendEmail(options: MailOptions): Promise<SendResult> {
   try {
-    const transporter = getTransporter();
+    const t = getTransporter();
+    const rawFrom = process.env.SMTP_USER || process.env.EMAIL_ADDRESS || "noreply@teksys-services.com";
+    const fromAddress = `"TEKSYS Registration" <${rawFrom}>`;
 
-    await transporter.sendMail({
-      from: process.env.EMAIL_ADDRESS || "noreply@teksys-services.com",
+    const info = await t.sendMail({
+      from: fromAddress,
       to: options.to,
       subject: options.subject,
       html: options.html,
+      text: options.text,
       replyTo: options.replyTo,
     });
 
-    return true;
-  } catch (error) {
-    console.error("Email send failed:", error);
-    return false;
+    console.log("[MAILER] ✅ Email sent successfully. MessageId:", info.messageId);
+    return { success: true };
+  } catch (error: any) {
+    // Invalidate cached transporter on auth failures so next attempt recreates it
+    if (error?.code === "EAUTH" || error?.code === "ESOCKET" || error?.code === "ECONNECTION") {
+      transporter = null;
+    }
+
+    const errorMessage = error?.message || "Unknown email error";
+    const errorCode = error?.code || "UNKNOWN";
+    const errorResponse = error?.response || "";
+
+    console.error("[MAILER] ❌ Email send FAILED:");
+    console.error("  Code:", errorCode);
+    console.error("  Message:", errorMessage);
+    console.error("  SMTP Response:", errorResponse);
+    console.error("  Full Error:", error);
+
+    return {
+      success: false,
+      error: `SMTP Error (${errorCode}): ${errorMessage}`,
+    };
   }
 }
 
 export async function verifySmtpConnection(): Promise<boolean> {
   try {
-    const transporter = getTransporter();
-    await transporter.verify();
-    console.log("SMTP connection verified");
+    const t = getTransporter();
+    await t.verify();
+    console.log("[MAILER] ✅ SMTP connection verified");
     return true;
-  } catch (error) {
-    console.error("SMTP verification failed:", error);
+  } catch (error: any) {
+    transporter = null;
+    console.error("[MAILER] ❌ SMTP verification failed:", error?.message);
     return false;
   }
 }

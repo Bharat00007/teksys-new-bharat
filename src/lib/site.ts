@@ -19,6 +19,7 @@ export const NAV = [
   { to: "/about", label: "About Us" },
   { to: "/services", label: "Services" },
   { to: "/training", label: "Training Academy" },
+  { to: "/semiconductor-skill-training", label: "Semiconductor Skill Training Program" },
   { to: "/contact", label: "Contact Us" },
 ] as const;
 
