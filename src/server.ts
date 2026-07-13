@@ -60,9 +60,10 @@ export default {
       if (request.method === "POST" && url.pathname === "/api/diagnostics/smtp") {
         try {
           const res = await handleDiagnosticsAPI(request);
+          const bodyText = await res.text();
           const headers = new Headers(res.headers);
           headers.set("Access-Control-Allow-Origin", "*");
-          return new Response(res.body, { status: res.status, statusText: res.statusText, headers });
+          return new Response(bodyText, { status: res.status, statusText: res.statusText, headers });
         } catch (err: any) {
           console.error('[SERVER] Uncaught error in /api/diagnostics/smtp handler:', err);
           return new Response(JSON.stringify({ success: false, message: err?.message || 'Internal server error' }), {
@@ -78,9 +79,10 @@ export default {
       if (request.method === "POST" && url.pathname === "/api/registration") {
         try {
           const res = await handleRegistrationAPI(request);
+          const bodyText = await res.text();
           const headers = new Headers(res.headers);
           headers.set("Access-Control-Allow-Origin", "*");
-          return new Response(res.body, { status: res.status, statusText: res.statusText, headers });
+          return new Response(bodyText, { status: res.status, statusText: res.statusText, headers });
         } catch (err: any) {
           console.error('[SERVER] Uncaught error in /api/registration handler:', err);
           return new Response(JSON.stringify({ success: false, message: err?.message || 'Internal server error' }), {
