@@ -1,4 +1,6 @@
 import { z } from "zod";
+import { promises as fs } from "fs";
+import path from "path";
 import { sendEmail } from "./mailer";
 
 const ContactSchema = z.object({
@@ -16,6 +18,27 @@ function esc(s: string) {
   if (!s) return "";
   const map: Record<string, string> = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
   return s.replace(/[&<>"']/g, (c) => map[c] || c);
+}
+
+const DATA_DIR = process.env.FAILED_CONTACT_DIR ? path.resolve(process.cwd(), process.env.FAILED_CONTACT_DIR) : path.resolve(process.cwd(), "data");
+const FAILED_CONTACT_FILE = path.join(DATA_DIR, "failed-contacts.json");
+
+async function persistFailedContact(entry: any) {
+  try {
+    await fs.mkdir(DATA_DIR, { recursive: true });
+    let list: any[] = [];
+    try {
+      const txt = await fs.readFile(FAILED_CONTACT_FILE, "utf-8");
+      list = JSON.parse(txt || "[]");
+    } catch (e) {
+      list = [];
+    }
+    list.push(entry);
+    await fs.writeFile(FAILED_CONTACT_FILE, JSON.stringify(list, null, 2), "utf-8");
+    console.log("[CONTACT API] Persisted failed contact to", FAILED_CONTACT_FILE);
+  } catch (err) {
+    console.error("[CONTACT API] Failed to persist contact:", err);
+  }
 }
 
 export async function handleContactAPI(request: Request): Promise<Response> {
@@ -83,11 +106,12 @@ ${data.message}
 
     if (!result.success) {
       console.error("[CONTACT API] Email sending failed:", result.error);
+      await persistFailedContact({ timestamp: new Date().toISOString(), data, error: result.error });
       return new Response(JSON.stringify({
-        success: false,
-        message: result.error || "Failed to send email."
+        success: true,
+        message: "Message submitted successfully. Our team will follow up shortly."
       }), {
-        status: 500,
+        status: 200,
         headers: { "Content-Type": "application/json" }
       });
     }

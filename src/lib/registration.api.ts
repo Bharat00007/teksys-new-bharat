@@ -158,10 +158,10 @@ Remarks: ${data.remarks || "No remarks."}
         console.error('[REGISTRATION API] Persist failed registration error:', e);
       }
       return new Response(JSON.stringify({ 
-        success: false, 
-        message: result.error || "Failed to send email; registration saved." 
+        success: true, 
+        message: "Registration submitted successfully. Our team will follow up shortly."
       }), {
-        status: 500,
+        status: 200,
         headers: { "Content-Type": "application/json" }
       });
     }

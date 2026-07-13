@@ -21,11 +21,19 @@ function getTransporter() {
     return transporter;
   }
 
-  const smtpServer = process.env.SMTP_HOST || process.env.SMTP_SERVER;
-  const smtpPort = process.env.SMTP_PORT;
-  const emailAddress = process.env.SMTP_USER || process.env.EMAIL_ADDRESS;
-  const emailPassword = process.env.SMTP_PASS || process.env.EMAIL_PASSWORD;
+  const smtpServer = (process.env.SMTP_HOST || process.env.SMTP_SERVER || "").trim();
+  const smtpPort = (process.env.SMTP_PORT || "").trim();
+  const emailAddress = (process.env.SMTP_USER || process.env.EMAIL_ADDRESS || "").trim();
+  const emailPassword = (process.env.SMTP_PASS || process.env.EMAIL_PASSWORD || "").trim();
   const isSecure = process.env.SMTP_SECURE === "true" || parseInt(smtpPort || "", 10) === 465;
+
+  console.log("[MAILER] SMTP values at runtime:", {
+    smtpServer: smtpServer || "<missing>",
+    smtpPort: smtpPort || "<missing>",
+    emailAddress: emailAddress || "<missing>",
+    emailPassword: emailPassword ? `SET (${emailPassword.length})` : "<missing>",
+    isSecure,
+  });
 
   if (!smtpServer || !smtpPort || !emailAddress || !emailPassword) {
     throw new Error("SMTP configuration missing.");

@@ -189,8 +189,9 @@ export default function SemiconductorSkillTraining() {
     };
 
     try {
-      const apiUrl = (typeof process !== "undefined" && process?.env?.REACT_APP_API_URL) || "";
-      const response = await fetch(`${apiUrl}/api/registration`, {
+      const apiUrlRaw = String(import.meta.env.VITE_API_URL ?? "").trim();
+      const apiUrl = apiUrlRaw.length > 0 ? apiUrlRaw.replace(/\/$/, "") : "/api";
+      const response = await fetch(`${apiUrl}/registration`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ data }),
