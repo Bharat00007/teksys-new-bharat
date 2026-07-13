@@ -55,7 +55,7 @@ export function ContactForm({ source = "contact", topic, compact, title }: Props
       const result = await response.json();
       if (!response.ok) {
         setStatus("error");
-        setError(result.error || "Something went wrong. Please try again.");
+        setError(result.message || result.error || "Something went wrong. Please try again.");
         return;
       }
       setStatus("success");
