@@ -43,27 +43,52 @@ export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     try {
       const url = new URL(request.url);
+
+      // Handle CORS Preflight for API routes
+      if (request.method === "OPTIONS" && url.pathname.startsWith("/api/")) {
+        return new Response(null, {
+          status: 204,
+          headers: {
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type",
+          }
+        });
+      }
+
       // Diagnostics endpoint (protected by DIAG_KEY env) for integrated SMTP checks
       if (request.method === "POST" && url.pathname === "/api/diagnostics/smtp") {
         try {
-          return await handleDiagnosticsAPI(request);
+          const res = await handleDiagnosticsAPI(request);
+          const headers = new Headers(res.headers);
+          headers.set("Access-Control-Allow-Origin", "*");
+          return new Response(res.body, { status: res.status, statusText: res.statusText, headers });
         } catch (err: any) {
           console.error('[SERVER] Uncaught error in /api/diagnostics/smtp handler:', err);
           return new Response(JSON.stringify({ success: false, message: err?.message || 'Internal server error' }), {
             status: 500,
-            headers: { "content-type": "application/json" },
+            headers: { 
+              "content-type": "application/json",
+              "Access-Control-Allow-Origin": "*"
+            },
           });
         }
       }
 
       if (request.method === "POST" && url.pathname === "/api/registration") {
         try {
-          return await handleRegistrationAPI(request);
+          const res = await handleRegistrationAPI(request);
+          const headers = new Headers(res.headers);
+          headers.set("Access-Control-Allow-Origin", "*");
+          return new Response(res.body, { status: res.status, statusText: res.statusText, headers });
         } catch (err: any) {
           console.error('[SERVER] Uncaught error in /api/registration handler:', err);
           return new Response(JSON.stringify({ success: false, message: err?.message || 'Internal server error' }), {
             status: 500,
-            headers: { "content-type": "application/json" },
+            headers: { 
+              "content-type": "application/json",
+              "Access-Control-Allow-Origin": "*"
+            },
           });
         }
       }

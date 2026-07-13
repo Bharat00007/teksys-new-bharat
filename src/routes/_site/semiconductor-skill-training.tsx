@@ -189,9 +189,7 @@ export default function SemiconductorSkillTraining() {
     };
 
     try {
-      const apiUrl = typeof process !== "undefined" && process.env.REACT_APP_API_URL 
-        ? process.env.REACT_APP_API_URL 
-        : "";
+      const apiUrl = (typeof process !== "undefined" && process?.env?.REACT_APP_API_URL) || "";
       const response = await fetch(`${apiUrl}/api/registration`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
