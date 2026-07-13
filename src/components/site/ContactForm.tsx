@@ -43,7 +43,7 @@ export function ContactForm({ source = "contact", topic, compact, title }: Props
 
     try {
       // Send to API endpoint (configure your backend URL)
-      const apiUrl = process.env.REACT_APP_API_URL || "/api";
+      const apiUrl = (typeof process !== "undefined" && process?.env?.REACT_APP_API_URL) || "/api";
       const response = await fetch(`${apiUrl}/contact`, {
         method: "POST",
         headers: {

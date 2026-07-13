@@ -3,13 +3,14 @@ import react from "@vitejs/plugin-react";
 import tsconfigPaths from "vite-tsconfig-paths";
 import tailwindcss from "@tailwindcss/vite";
 import { handleRegistrationAPI } from "./src/lib/registration.api";
+import { handleContactAPI } from "./src/lib/contact.api";
 import { IncomingMessage, ServerResponse } from "node:http";
 
 const apiPlugin = () => ({
   name: "api-plugin",
   configureServer(server: any) {
     server.middlewares.use((req: IncomingMessage, res: ServerResponse, next: Function) => {
-      if (req.url === "/api/registration" && req.method === "POST") {
+      if ((req.url === "/api/registration" || req.url === "/api/contact") && req.method === "POST") {
         let body = "";
         req.on("data", (chunk) => {
           body += chunk.toString();
@@ -21,7 +22,10 @@ const apiPlugin = () => ({
               headers: req.headers as any,
               body: body || null,
             });
-            const response = await handleRegistrationAPI(webRequest);
+            const response = req.url === "/api/contact" 
+              ? await handleContactAPI(webRequest)
+              : await handleRegistrationAPI(webRequest);
+              
             res.statusCode = response.status;
             response.headers.forEach((value, key) => {
               res.setHeader(key, value);
