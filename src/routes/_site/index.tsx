@@ -24,7 +24,7 @@ import advisor from "@/assets/dr-kumud-ranjan.jpg";
 import partnerTdx from "@/assets/partner-techdatax.jpg";
 import partnerAligned from "@/assets/partner-aligned-test.jpg";
 import partnerSemicom from "@/assets/partner-semicom.jpg";
-import collageGan from "@/assets/service-gan.jpg";
+import collageGan from "@/assets/service-gan.jpeg";
 import collageMmic from "@/assets/service-rf.jpg";
 import collageTraining from "@/assets/training-classroom.jpg";
 import { SERVICES, COURSES, SITE } from "@/lib/site";

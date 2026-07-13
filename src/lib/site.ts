@@ -1,4 +1,4 @@
-import gan from "@/assets/service-gan.jpg";
+import gan from "@/assets/service-gan.jpeg";
 import sic from "@/assets/service-sic.jpg";
 import rf from "@/assets/service-rf.jpg";
 
