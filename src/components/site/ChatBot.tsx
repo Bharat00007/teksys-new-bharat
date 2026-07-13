@@ -124,16 +124,25 @@ export function ChatBot() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.9 }}
             transition={{ duration: 0.2 }}
-            className="fixed bottom-40 right-8 z-40 w-96 max-w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border border-border bg-background shadow-2xl"
+            className="fixed bottom-28 right-8 z-40 flex max-h-[calc(100dvh-18rem)] w-96 max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-2xl border border-border bg-background shadow-2xl"
           >
             {/* Header */}
-            <div className="bg-gradient-to-r from-indigo-600 to-indigo-700 px-6 py-4 text-white">
-              <h3 className="font-semibold">TEKSYS Assistant</h3>
-              <p className="text-xs text-white/80">Always here to help</p>
+            <div className="flex shrink-0 items-center justify-between bg-gradient-to-r from-indigo-600 to-indigo-700 px-6 py-4 text-white">
+              <div>
+                <h3 className="font-semibold">TEKSYS Assistant</h3>
+                <p className="text-xs text-white/80">Always here to help</p>
+              </div>
+              <button
+                onClick={() => setIsOpen(false)}
+                className="rounded-full p-1 transition-colors hover:bg-white/20"
+                aria-label="Close chat"
+              >
+                <X className="h-5 w-5" />
+              </button>
             </div>
 
             {/* Messages */}
-            <div className="flex h-96 flex-col overflow-y-auto bg-white p-4">
+            <div className="flex min-h-[8rem] flex-1 flex-col overflow-y-auto bg-white p-4">
               <div className="flex flex-col gap-4">
                 {messages.map((message) => (
                   <motion.div
@@ -176,7 +185,7 @@ export function ChatBot() {
 
             {/* Quick Replies */}
             {messages.length <= 1 && (
-              <div className="border-t border-border bg-gray-50 px-4 py-3">
+              <div className="shrink-0 border-t border-border bg-gray-50 px-4 py-3">
                 <p className="mb-2 text-xs font-semibold text-foreground/70">Quick replies:</p>
                 <div className="flex flex-wrap gap-2">
                   {QUICK_REPLIES.map((reply) => (
@@ -193,7 +202,7 @@ export function ChatBot() {
             )}
 
             {/* Input */}
-            <div className="border-t border-border bg-white p-4">
+            <div className="shrink-0 border-t border-border bg-white p-4">
               <div className="flex gap-2">
                 <input
                   type="text"
