@@ -53,20 +53,22 @@ function TrainingPage() {
       <Section>
         <SectionTitle
           eyebrow="Certification Tracks"
-          title="Our 8 Certification Tracks"
+          title="Our 10 Certification Tracks"
           description="Choose your path to semiconductor expertise"
         />
         <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
           {COURSES.map((course) => {
             const colors = [
-              { bg: "bg-blue-900", text: "text-white" },
-              { bg: "bg-green-700", text: "text-white" },
-              { bg: "bg-blue-600", text: "text-white" },
-              { bg: "bg-red-700", text: "text-white" },
-              { bg: "bg-teal-600", text: "text-white" },
-              { bg: "bg-pink-600", text: "text-white" },
               { bg: "bg-blue-800", text: "text-white" },
-              { bg: "bg-amber-700", text: "text-white" },
+              { bg: "bg-green-600", text: "text-white" },
+              { bg: "bg-blue-600", text: "text-white" },
+              { bg: "bg-red-600", text: "text-white" },
+              { bg: "bg-blue-700", text: "text-white" },
+              { bg: "bg-gray-900", text: "text-white" },
+              { bg: "bg-green-600", text: "text-white" },
+              { bg: "bg-red-600", text: "text-white" },
+              { bg: "bg-green-600", text: "text-white" },
+              { bg: "bg-red-600", text: "text-white" },
             ];
             const color = colors[parseInt(course.number) - 1] || colors[0];
             
