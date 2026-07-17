@@ -17,7 +17,6 @@ import {
   ClipboardList,
   Handshake,
   Factory,
-  Radio,
 } from "lucide-react";
 import hero from "@/assets/hero-semiconductor.jpg";
 import advisor from "@/assets/dr-kumud-ranjan.jpg";
@@ -135,16 +134,16 @@ function HeroCard({
 }
 
 const PILL_ITEMS = [
-  { n: "01", label: "Semiconductor Fundamentals", icon: Cpu, color: "bg-amber-200 text-amber-900", num: "bg-amber-500" },
-  { n: "02", label: "GaN & SiC Technologies", icon: Hexagon, color: "bg-emerald-200 text-emerald-900", num: "bg-emerald-600" },
-  { n: "03", label: "Device Simulation", icon: MonitorPlay, color: "bg-cyan-200 text-cyan-900", num: "bg-cyan-600" },
-  { n: "04", label: "RF & GaN Applications", icon: Radio, color: "bg-blue-200 text-blue-900", num: "bg-blue-600" },
-  { n: "05", label: "SiC / GaN Power Electronics", icon: Network, color: "bg-fuchsia-200 text-fuchsia-900", num: "bg-fuchsia-500" },
-  { n: "06", label: "Fabless Design Flow", icon: Layers, color: "bg-orange-200 text-orange-900", num: "bg-orange-500" },
-  { n: "07", label: "Mini Project & Presentation", icon: ClipboardList, color: "bg-pink-200 text-pink-900", num: "bg-pink-500" },
-  { n: "08", label: "Fabless GaN MMIC", icon: Cpu, color: "bg-teal-200 text-teal-900", num: "bg-teal-600" },
-  { n: "09", label: "GaN Technology Partner", icon: Handshake, color: "bg-lime-200 text-lime-900", num: "bg-lime-600" },
-  { n: "10", label: "OSAT Lab and Process Lab", icon: Factory, color: "bg-violet-200 text-violet-900", num: "bg-violet-600" },
+  { n: "01", label: "Semiconductor Fundamentals", icon: Cpu, color: "bg-blue-200 text-blue-900", num: "bg-blue-800" },
+  { n: "02", label: "TCAD & Device Simulation", icon: MonitorPlay, color: "bg-green-200 text-green-900", num: "bg-green-600" },
+  { n: "03", label: "Wafer Epitaxy & Materials", icon: Hexagon, color: "bg-cyan-200 text-cyan-900", num: "bg-blue-600" },
+  { n: "04", label: "Wafer Fabrication & Cleanroom", icon: Factory, color: "bg-red-200 text-red-900", num: "bg-red-600" },
+  { n: "05", label: "Gases, Chemicals & Facilities", icon: Layers, color: "bg-blue-200 text-blue-900", num: "bg-blue-700" },
+  { n: "06", label: "Device Testing & Characterization", icon: Microscope, color: "bg-gray-200 text-gray-900", num: "bg-gray-900" },
+  { n: "07", label: "Packaging & Assembly", icon: ClipboardList, color: "bg-green-200 text-green-900", num: "bg-green-600" },
+  { n: "08", label: "Reliability & Quality", icon: Network, color: "bg-red-200 text-red-900", num: "bg-red-600" },
+  { n: "09", label: "ISO, EHS & Compliance", icon: Handshake, color: "bg-green-200 text-green-900", num: "bg-green-600" },
+  { n: "10", label: "CS, AI, ML & Data Analytics", icon: Cpu, color: "bg-red-200 text-red-900", num: "bg-red-600" },
 ];
 
 function PillarGrid() {
@@ -228,9 +227,23 @@ function ServicesPreview() {
 }
 
 function TrainingPreview() {
+  /* Badge colors matching the reference design exactly */
+  const badgeColors: Record<string, string> = {
+    "01": "bg-blue-800",      // dark blue
+    "02": "bg-green-600",     // green
+    "03": "bg-blue-600",      // blue
+    "04": "bg-red-600",       // red
+    "05": "bg-blue-700",      // blue
+    "06": "bg-gray-900",      // dark/black
+    "07": "bg-green-600",     // green
+    "08": "bg-red-600",       // red
+    "09": "bg-green-600",     // green
+    "10": "bg-red-600",       // red
+  };
+
   return (
     <section className="bg-ink text-white">
-      <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-[90rem] px-4 py-20 sm:px-6 lg:px-8">
         <div className="grid items-end gap-8 lg:grid-cols-2">
           <div>
             <SectionEyebrow>Training Academy</SectionEyebrow>
@@ -238,7 +251,7 @@ function TrainingPreview() {
               Semiconductor Skill <span className="text-gradient-brand">Training Academy</span>
             </h2>
             <p className="mt-4 max-w-2xl text-white/70">
-              Eight industry-led programs covering the full semiconductor value chain — taught by
+              Ten industry-led programs covering the full semiconductor value chain — taught by
               experienced practitioners with hands-on labs, projects and global certification.
             </p>
           </div>
@@ -258,69 +271,58 @@ function TrainingPreview() {
           </div>
         </div>
 
-        <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-          {COURSES.slice(0, 8).map((course) => {
-            const colors = [
-              { bg: "bg-blue-900", text: "text-white" },
-              { bg: "bg-green-700", text: "text-white" },
-              { bg: "bg-blue-600", text: "text-white" },
-              { bg: "bg-red-700", text: "text-white" },
-              { bg: "bg-teal-600", text: "text-white" },
-              { bg: "bg-pink-600", text: "text-white" },
-              { bg: "bg-blue-800", text: "text-white" },
-              { bg: "bg-amber-700", text: "text-white" },
-            ];
-            const color = colors[parseInt(course.number) - 1] || colors[0];
-
-            return (
-              <Link
-                key={course.slug}
-                to={`/training#${course.slug}`}
-                className="flex flex-col rounded-2xl border border-border bg-card p-6 transition hover:shadow-lg hover:border-primary/50"
+        {/* Cards Grid — 5 columns on desktop to match reference */}
+        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+          {COURSES.map((course, i) => (
+            <motion.div
+              key={course.slug}
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{ duration: 0.4, delay: i * 0.04 }}
+              className="group flex flex-col rounded-2xl border-2 border-ink-soft bg-white p-5 transition-shadow hover:shadow-2xl"
+            >
+              {/* Numbered Badge */}
+              <div
+                className={`mb-4 inline-flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold text-white ${badgeColors[course.number] || "bg-blue-800"}`}
               >
-                {/* Number Circle */}
-                <div
-                  className={`mb-4 inline-flex h-10 w-10 items-center justify-center rounded-full font-bold ${color.bg} ${color.text}`}
-                >
-                  {course.number}
-                </div>
+                {course.number}
+              </div>
 
-                {/* Title */}
-                <h3 className="mb-3 text-lg font-semibold text-black">{course.title}</h3>
+              {/* Title */}
+              <h3 className="mb-3 text-base font-bold leading-snug text-gray-900">
+                {course.title}
+              </h3>
 
-                {/* Description */}
-                <p className="mb-4 flex-grow text-sm text-muted-foreground">
-                  {course.overview}
-                </p>
+              {/* Description */}
+              <p className="mb-5 flex-grow text-[13px] leading-relaxed text-gray-500">
+                {course.overview}
+              </p>
 
-                {/* Key Learning Areas */}
-                <div className="mb-6">
-                  <h4 className="mb-2 text-xs font-semibold uppercase tracking-widest text-primary">
-                    Key Learning Areas
-                  </h4>
-                  <ul className="space-y-1.5">
-                    {course.keyLearningAreas.map((area) => (
-                      <li key={area} className="flex gap-2 text-xs text-muted-foreground">
-                        <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
-                        {area}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+              {/* Key Learning Areas — mt-auto pushes this block to the bottom */}
+              <div className="mt-auto mb-5">
+                <h4 className="mb-2 text-xs font-bold uppercase tracking-widest text-primary">
+                  Key Learning Areas
+                </h4>
+                <ul className="space-y-1.5">
+                  {course.keyLearningAreas.map((area) => (
+                    <li key={area} className="flex items-start gap-2 text-xs text-gray-500">
+                      <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+                      {area}
+                    </li>
+                  ))}
+                </ul>
+              </div>
 
-                {/* Enroll Button */}
-                <button
-                  type="button"
-                  onClick={() => {
-                    window.open("https://docs.google.com/forms/d/e/1FAIpQLSfoZY580yp_rCbRtd73i_NRfD5PcstWpMFEWJTTbthPJt27mg/viewform", "_blank");
-                  }}
-                  className="w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition hover:bg-indigo-glow"
-                >
-                  ENROLL NOW
-                </button>
+              {/* Enroll Now Button */}
+              <Link
+                to={`/training#${course.slug}`}
+                className="block w-full rounded-lg bg-ink px-4 py-2.5 text-center text-sm font-semibold text-white transition hover:bg-indigo-glow"
+              >
+                ENROLL NOW
               </Link>
-            );
-          })}
+            </motion.div>
+          ))}
         </div>
       </div>
     </section>
