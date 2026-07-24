@@ -24,7 +24,6 @@ import partnerTdx from "@/assets/partner-techdatax.jpg";
 import partnerAligned from "@/assets/partner-aligned-test.jpg";
 import partnerSemicom from "@/assets/partner-semicom.jpg";
 import collageGan from "@/assets/service-gan.jpeg";
-import collageMmic from "@/assets/service-rf.jpg";
 import collageTraining from "@/assets/training-classroom.jpg";
 import { SERVICES, COURSES, SITE } from "@/lib/site";
 import { Section, SectionTitle, SectionEyebrow } from "@/components/site/Section";
@@ -51,22 +50,24 @@ function Hero() {
       <div className="mx-auto grid max-w-7xl gap-10 px-4 pb-12 pt-12 sm:px-6 lg:grid-cols-2 lg:gap-12 lg:px-8 lg:pb-20 lg:pt-20">
         <div className="flex flex-col justify-center">
           <motion.h1
-            initial={{ opacity: 0, y: 14 }}
+            initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-3xl font-bold leading-tight tracking-tight text-foreground sm:text-4xl lg:text-[2.6rem]"
+            transition={{ duration: 0.7, ease: "easeOut" }}
+            className="text-[2rem] font-extrabold leading-[1.15] tracking-tight text-foreground drop-shadow-sm sm:text-[2.5rem] lg:text-[3rem] lg:leading-[1.1]"
           >
-            Semiconductor, Defence &amp; Advance Technology Solutions
+            Semiconductor, Defence &amp; Advanced Technology Solutions
           </motion.h1>
           <motion.p
-            initial={{ opacity: 0, y: 14 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="mt-8 max-w-xl text-base leading-relaxed text-primary"
+            transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
+            className="mt-6 max-w-xl text-lg leading-relaxed text-foreground/80"
           >
-            Supporting Industry, Academic, Startup &amp; Government Organization Through Technology
-            <br />
-            Computing, Engineering Services &amp; Semiconductor Workforce Development
+            Supporting Industry, Academia, Startups &amp; Government Organizations Through{" "}
+            <span className="font-semibold text-primary">Semiconductor Skill Training</span>,{" "}
+            <span className="font-medium text-foreground">Technology Computing</span>,{" "}
+            <span className="font-medium text-foreground">Engineering Services</span> &amp;{" "}
+            <span className="font-medium text-foreground">Workforce Development</span>
           </motion.p>
         </div>
 
@@ -78,17 +79,10 @@ function Hero() {
         >
           <HeroCard
             img={collageGan}
-            eyebrow="GaN Technology"
-            title="Consulting"
+            title="GaN Technology, Fabless & MMIC Design and Development"
             position="bottom"
-            className="aspect-[4/3]"
-          />
-          <HeroCard
-            img={collageMmic}
-            title="Fabless & MMIC design and Development"
-            position="bottom"
-            //caption="Semiconductor Fabless & MMIC Design and Development"
-            className="aspect-[4/3]"
+            className="col-span-2 aspect-[16/7]"
+            imgClassName="object-[center_75%]"
           />
           <HeroCard
             img={collageTraining}
@@ -110,6 +104,7 @@ function HeroCard({
   caption,
   position = "bottom",
   className = "",
+  imgClassName = "",
 }: {
   img: string;
   eyebrow?: string;
@@ -117,10 +112,11 @@ function HeroCard({
   caption?: string;
   position?: "top" | "bottom";
   className?: string;
+  imgClassName?: string;
 }) {
   return (
     <div className={`group relative overflow-hidden rounded-md shadow-md ${className}`}>
-      <img src={img} alt={title} className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105" />
+      <img src={img} alt={title} className={`absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105 ${imgClassName}`} />
       <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-ink/20 to-transparent" />
       <div
         className={`absolute inset-x-0 ${position === "top" ? "top-0 p-4" : "bottom-0 p-4"} text-white`}

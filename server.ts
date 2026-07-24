@@ -16,7 +16,7 @@ const envFiles = [
 ];
 for (const envFile of envFiles) {
   if (fs.existsSync(envFile)) {
-    const envResult = dotenv.config({ path: envFile, override: false });
+    const envResult = dotenv.config({ path: envFile, override: true }); // override: true ensures .env variables take precedence, helpful for Hostinger deployments where system envs might interfere
     if (envResult.error) {
       console.warn(`⚠️  Failed to load env from ${envFile}:`, envResult.error.message || envResult.error);
     } else {
@@ -74,6 +74,10 @@ app.use((req, res, next) => {
 function createWebRequest(req: express.Request) {
   const headers = new Headers();
   for (const [key, value] of Object.entries(req.headers)) {
+    // Skip headers that could cause conflicts when reconstructing the request
+    if (key.toLowerCase() === 'content-length' || key.toLowerCase() === 'host') {
+      continue;
+    }
     if (value) {
       if (Array.isArray(value)) {
         value.forEach(v => headers.append(key, v));
@@ -83,7 +87,13 @@ function createWebRequest(req: express.Request) {
     }
   }
 
-  return new Request("http://localhost" + req.url, {
+  // Ensure Content-Type is set for POST requests with a body
+  if (req.method === "POST" && !headers.has("content-type")) {
+    headers.set("content-type", "application/json");
+  }
+
+  const url = `http://${req.headers.host || "localhost"}${req.originalUrl || req.url}`;
+  return new Request(url, {
     method: req.method,
     headers: headers,
     body: req.method === "POST" ? JSON.stringify(req.body) : undefined
@@ -93,25 +103,29 @@ function createWebRequest(req: express.Request) {
 // API Routes
 app.post("/api/registration", async (req, res) => {
   try {
+    console.log(`[SERVER] /api/registration called with body:`, req.body);
     const webRequest = createWebRequest(req);
     const response = await handleRegistrationAPI(webRequest);
     const body = await response.text();
+    console.log(`[SERVER] /api/registration responded with status ${response.status}:`, body);
     res.status(response.status).type('application/json').send(body);
   } catch (error) {
-    console.error("Registration API error:", error);
-    res.status(500).json({ success: false, message: "Internal Server Error" });
+    console.error("[SERVER] Registration API routing error:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error", error: error instanceof Error ? error.message : String(error) });
   }
 });
 
 app.post("/api/contact", async (req, res) => {
   try {
+    console.log(`[SERVER] /api/contact called with body:`, req.body);
     const webRequest = createWebRequest(req);
     const response = await handleContactAPI(webRequest);
     const body = await response.text();
+    console.log(`[SERVER] /api/contact responded with status ${response.status}:`, body);
     res.status(response.status).type('application/json').send(body);
   } catch (error) {
-    console.error("Contact API error:", error);
-    res.status(500).json({ success: false, message: "Internal Server Error" });
+    console.error("[SERVER] Contact API routing error:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error", error: error instanceof Error ? error.message : String(error) });
   }
 });
 
