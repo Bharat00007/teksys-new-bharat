@@ -197,6 +197,11 @@ export default function SemiconductorSkillTraining() {
         body: JSON.stringify({ data }),
       });
 
+      const contentType = response.headers.get("content-type") || "";
+      if (!contentType.includes("application/json")) {
+        const body = (await response.text()).slice(0, 200);
+        throw new Error(`The registration API returned ${contentType || "an unknown content type"} (HTTP ${response.status}) instead of JSON.${body ? ` Response starts: ${body}` : ""}`);
+      }
       const result = await response.json();
       if (!response.ok || !result.success) {
         setStatus("error");

@@ -61,11 +61,21 @@ app.use(cors());
 app.use(express.json({ limit: '1mb' }));
 app.use((req, res, next) => {
   if (req.path.startsWith("/api")) {
-    console.log(`[SERVER] API request ${req.method} ${req.originalUrl}`);
+    const startedAt = Date.now();
+    console.log(`[SERVER] API request ${req.method} ${req.originalUrl}`, {
+      origin: req.get("origin") || "same-origin",
+      contentType: req.get("content-type") || "none",
+    });
     if (req.method === "POST") {
       console.log("[SERVER] API request body:", JSON.stringify(req.body));
     }
-    res.type("application/json");
+    res.on("finish", () => {
+      console.log(`[SERVER] API response ${req.method} ${req.originalUrl}`, {
+        status: res.statusCode,
+        contentType: res.getHeader("content-type") || "not-set",
+        durationMs: Date.now() - startedAt,
+      });
+    });
   }
   next();
 });
@@ -108,7 +118,7 @@ app.post("/api/registration", async (req, res) => {
     const response = await handleRegistrationAPI(webRequest);
     const body = await response.text();
     console.log(`[SERVER] /api/registration responded with status ${response.status}:`, body);
-    res.status(response.status).type('application/json').send(body);
+    res.status(response.status).type("application/json").send(body);
   } catch (error) {
     console.error("[SERVER] Registration API routing error:", error);
     res.status(500).json({ success: false, message: "Internal Server Error", error: error instanceof Error ? error.message : String(error) });
@@ -122,7 +132,7 @@ app.post("/api/contact", async (req, res) => {
     const response = await handleContactAPI(webRequest);
     const body = await response.text();
     console.log(`[SERVER] /api/contact responded with status ${response.status}:`, body);
-    res.status(response.status).type('application/json').send(body);
+    res.status(response.status).type("application/json").send(body);
   } catch (error) {
     console.error("[SERVER] Contact API routing error:", error);
     res.status(500).json({ success: false, message: "Internal Server Error", error: error instanceof Error ? error.message : String(error) });
@@ -166,8 +176,8 @@ const distPath = path.join(__dirname, "dist");
 if (fs.existsSync(distPath)) {
   app.use(express.static(distPath));
 
-  // Handle SPA routing by serving index.html for all non-API routes
-  app.use((req, res) => {
+  // Handle SPA routing only for non-API routes. API requests must always receive JSON.
+  app.get(/^(?!\/api(?:\/|$)).*/, (req, res) => {
     res.sendFile(path.join(distPath, "index.html"));
   });
 } else {

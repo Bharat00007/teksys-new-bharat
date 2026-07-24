@@ -53,6 +53,11 @@ export function ContactForm({ source = "contact", topic, compact, title }: Props
         body: JSON.stringify({ data: payload }),
       });
 
+      const contentType = response.headers.get("content-type") || "";
+      if (!contentType.includes("application/json")) {
+        const body = (await response.text()).slice(0, 200);
+        throw new Error(`The contact API returned ${contentType || "an unknown content type"} (HTTP ${response.status}) instead of JSON.${body ? ` Response starts: ${body}` : ""}`);
+      }
       const result = await response.json();
       if (!response.ok) {
         setStatus("error");
