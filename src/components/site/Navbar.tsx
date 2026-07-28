@@ -6,6 +6,11 @@ import logo from "@/assets/teksys1.png";
 import { NAV, SITE } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
+const navbarLabels: Record<string, string> = {
+  "/training": "Training Module & Certification",
+  "/semiconductor-skill-training": "Academy, Industry & Trainee Partner MoU",
+};
+
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
@@ -26,7 +31,7 @@ export function Navbar() {
           : "bg-background",
       )}
     >
-      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between gap-6 px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto grid h-20 max-w-7xl grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-4 px-4 sm:px-6 lg:px-8">
         <Link to="/" className="flex flex-col leading-none" aria-label={SITE.name}>
           <img src={logo} alt="TEKSYS logo" className="h-10 w-30 object-contain" />
           <span className="mt-1 text-[10px] font-semibold tracking-[0.18em] text-primary/80">
@@ -34,17 +39,18 @@ export function Navbar() {
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-8 md:flex" aria-label="Primary">
+        <nav className="hidden min-w-0 items-center justify-center gap-4 xl:flex" aria-label="Primary">
           {NAV.map((item) => {
             const isServices = item.label === "Services";
+            const label = navbarLabels[item.to] || item.label;
             return (
               <NavLink
                 key={item.to}
                 to={item.to}
                 end={item.to === "/"}
-                className={({ isActive }) => `group relative inline-flex items-center gap-1 py-2 text-[15px] font-medium transition-colors ${isActive ? "!text-primary" : "text-foreground/80 hover:text-primary"}`}
+                className={({ isActive }) => `group relative inline-flex items-center gap-1 whitespace-nowrap py-2 text-[15px] font-medium transition-colors ${isActive ? "!text-primary" : "text-foreground/80 hover:text-primary"}`}
               >
-                {item.label}
+                {label}
                 {isServices && <ChevronDown className="h-3.5 w-3.5" />}
                 <span className="absolute -bottom-0.5 left-0 h-0.5 w-full origin-center scale-x-0 bg-primary transition-transform group-[.active]:scale-x-100 group-aria-[current=page]:scale-x-100" />
               </NavLink>
@@ -52,7 +58,7 @@ export function Navbar() {
           })}
         </nav>
 
-        <div className="hidden md:block">
+        <div className="hidden xl:block">
           <Link
             to="/contact"
             className="inline-flex items-center gap-1.5 rounded-md bg-primary px-6 py-3 text-sm font-bold uppercase tracking-wide text-primary-foreground shadow-sm transition-transform hover:-translate-y-0.5 hover:bg-indigo-glow"
@@ -63,7 +69,7 @@ export function Navbar() {
 
         <button
           type="button"
-          className="inline-flex items-center justify-center rounded-md p-2 text-foreground md:hidden"
+          className="col-start-3 inline-flex items-center justify-center rounded-md p-2 text-foreground xl:hidden"
           onClick={() => setOpen((v) => !v)}
           aria-label="Toggle menu"
           aria-expanded={open}
@@ -78,7 +84,7 @@ export function Navbar() {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="overflow-hidden border-t border-border/60 bg-background md:hidden"
+            className="overflow-hidden border-t border-border/60 bg-background xl:hidden"
           >
             <div className="space-y-1 px-4 py-3">
               {NAV.map((item) => (
@@ -88,7 +94,7 @@ export function Navbar() {
                   onClick={() => setOpen(false)}
                   className="block rounded-md px-3 py-2 text-base font-medium text-foreground hover:bg-accent"
                 >
-                  {item.label}
+                  {navbarLabels[item.to] || item.label}
                 </Link>
               ))}
               <Link

@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { Loader2, CheckCircle2, AlertCircle } from "lucide-react";
+import { Loader2, CheckCircle2, AlertCircle, Check } from "lucide-react";
 import { Section, SectionEyebrow } from "@/components/site/Section";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -9,6 +9,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
+import { COURSES } from "@/lib/site";
 
 const MODULES = [
   {
@@ -152,10 +153,17 @@ export default function SemiconductorSkillTraining() {
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
   const [selectedModules, setSelectedModules] = useState<Record<string, string[]>>({});
-  
+  const [selectedTenModules, setSelectedTenModules] = useState<string[]>([]);
+
   // State for strictly resetting radio groups
   const [whoAreYou, setWhoAreYou] = useState<string>("");
   const [mou, setMou] = useState<string>("yes");
+
+  const toggleTenModule = (title: string) => {
+    setSelectedTenModules(prev =>
+      prev.includes(title) ? prev.filter(t => t !== title) : [...prev, title]
+    );
+  };
 
   const handleModuleChange = (categoryId: string, optionLabel: string, checked: boolean) => {
     setSelectedModules(prev => {
@@ -185,6 +193,7 @@ export default function SemiconductorSkillTraining() {
       email: fd.get("email"),
       remarks: fd.get("remarks"),
       mou,
+      selectedTenModules,
       modules: selectedModules,
     };
 
@@ -213,9 +222,10 @@ export default function SemiconductorSkillTraining() {
       setStatus("success");
       if (formRef.current) formRef.current.reset();
       setSelectedModules({});
+      setSelectedTenModules([]);
       setWhoAreYou("");
       setMou("yes");
-      
+
     } catch (error) {
       setStatus("error");
       setErrorMsg("Something went wrong while submitting your registration. Please try again later or contact us.");
@@ -226,22 +236,18 @@ export default function SemiconductorSkillTraining() {
   return (
     <>
       {/* Hero Section */}
-      <section className="relative isolate overflow-hidden bg-hero-radial text-white py-20 sm:py-28">
+      <section className="relative isolate overflow-hidden bg-hero-radial text-white py-10 sm:py-14">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
-          <SectionEyebrow className="mx-auto text-white/80">Join The Future</SectionEyebrow>
-          <h1 className="mt-4 text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl max-w-4xl mx-auto">
-            Semiconductor Skill <span className="text-gradient-brand">Training Program</span>
+          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl max-w-4xl mx-auto">
+            Semiconductor Skill <span className="text-gradient-brand">Training Program MoU</span>
           </h1>
-          <p className="mt-6 text-lg max-w-2xl mx-auto text-white/75">
-            Register your institution and select the semiconductor technology training modules.
-          </p>
         </div>
       </section>
 
       {/* Main Form Section */}
       <Section className="py-16 sm:py-24 bg-background">
         <form ref={formRef} onSubmit={handleSubmit} className="mx-auto max-w-4xl space-y-12">
-          
+
           {/* Section 1: Institution Registration */}
           <Card className="border-primary/20 shadow-lg glow-ring overflow-hidden">
             <CardHeader className="bg-secondary/40 border-b border-border/50">
@@ -249,12 +255,12 @@ export default function SemiconductorSkillTraining() {
               <CardDescription>Please provide your basic details below.</CardDescription>
             </CardHeader>
             <CardContent className="grid gap-6 pt-8">
-              
+
               <div className="grid gap-3 mb-2">
                 <Label className="text-base font-semibold">Who are you? <span className="text-destructive">*</span></Label>
-                <RadioGroup 
-                  value={whoAreYou} 
-                  onValueChange={setWhoAreYou} 
+                <RadioGroup
+                  value={whoAreYou}
+                  onValueChange={setWhoAreYou}
                   className="flex flex-col sm:flex-row gap-4 sm:gap-8"
                   required
                 >
@@ -292,75 +298,126 @@ export default function SemiconductorSkillTraining() {
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="contactNumber">Contact Number <span className="text-destructive">*</span></Label>
-                  <Input 
-                    id="contactNumber" 
-                    name="contactNumber" 
+                  <Input
+                    id="contactNumber"
+                    name="contactNumber"
                     type="tel"
-                    required 
+                    required
                     pattern="[0-9]{10,15}"
                     title="Please enter a valid phone number (10 to 15 digits)"
-                    placeholder="e.g. 9876543210" 
-                    className="bg-background" 
+                    placeholder="e.g. 9876543210"
+                    className="bg-background"
                   />
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="email">Email Address <span className="text-destructive">*</span></Label>
-                  <Input 
-                    id="email" 
-                    name="email" 
+                  <Input
+                    id="email"
+                    name="email"
                     type="email"
-                    required 
-                    placeholder="Enter your email address" 
-                    className="bg-background" 
+                    required
+                    placeholder="Enter your email address"
+                    className="bg-background"
                   />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* Section 2: Module Tracks */}
+          {/* Section 2: Semiconductor Training Modules Selection */}
           <Card className="border-primary/20 shadow-lg glow-ring overflow-hidden">
-            <CardHeader className="bg-secondary/40 border-b border-border/50">
-              <CardTitle className="text-2xl">Section 2: Module Tracks</CardTitle>
-              <CardDescription>Please select the module tracks from the list below.</CardDescription>
+            <CardHeader className="bg-secondary/40 border-b border-border/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <CardTitle className="text-2xl">Section 2: Module Selection</CardTitle>
+                <CardDescription className="mt-1">
+                  Select the Semiconductor Training Modules you wish to enroll or partner for (Select multiple).
+                </CardDescription>
+              </div>
+              {selectedTenModules.length > 0 && (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3.5 py-1.5 text-xs font-semibold text-primary border border-primary/20 self-start sm:self-auto shadow-sm">
+                  <CheckCircle2 className="h-4 w-4" />
+                  {selectedTenModules.length} {selectedTenModules.length === 1 ? "module" : "modules"} selected
+                </span>
+              )}
             </CardHeader>
-            <CardContent className="pt-8">
-              <Accordion type="multiple" className="w-full space-y-4">
-                {MODULES.map((module) => (
-                  <AccordionItem 
-                    key={module.id} 
-                    value={module.id} 
-                    className="border border-border/60 rounded-lg px-4 bg-card hover:border-primary/40 transition-colors shadow-sm"
+            <CardContent className="pt-6 pb-8 space-y-6">
+              {/* Filter / Quick actions bar */}
+              <div className="flex flex-wrap items-center justify-between gap-3 text-xs border-b border-border/40 pb-4">
+                <span className="text-muted-foreground">
+                  Click any module card to select or deselect options.
+                </span>
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setSelectedTenModules(COURSES.map(c => c.title));
+                    }}
+                    className="text-primary hover:underline font-semibold cursor-pointer"
                   >
-                    <AccordionTrigger className="text-base font-semibold hover:no-underline hover:text-primary py-4">
-                      {module.title}
-                    </AccordionTrigger>
-                    <AccordionContent className="pt-2 pb-6">
-                      <div className="grid gap-5 sm:grid-cols-1 md:grid-cols-2">
-                        {module.options.map((option) => {
-                          const isChecked = selectedModules[module.id]?.includes(option.label) || false;
-                          return (
-                            <div key={option.id} className="flex flex-row items-start space-x-3 space-y-0 group">
-                              <Checkbox 
-                                id={option.id} 
-                                className="mt-1"
-                                checked={isChecked}
-                                onCheckedChange={(checked) => handleModuleChange(module.id, option.label, checked as boolean)}
-                              />
-                              <Label 
-                                htmlFor={option.id} 
-                                className="font-normal text-sm leading-relaxed cursor-pointer text-muted-foreground group-hover:text-foreground transition-colors"
-                              >
-                                {option.label}
-                              </Label>
-                            </div>
-                          );
-                        })}
+                    Select All
+                  </button>
+                  <span className="text-border">•</span>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setSelectedTenModules([]);
+                    }}
+                    className="text-muted-foreground hover:text-foreground hover:underline cursor-pointer"
+                  >
+                    Deselect All
+                  </button>
+                </div>
+              </div>
+
+              {/* Semiconductor Modules Selection Grid */}
+              <div className="grid gap-3.5 sm:grid-cols-2">
+                {COURSES.map((course) => {
+                  const isSelected = selectedTenModules.includes(course.title);
+                  return (
+                    <div
+                      key={course.slug}
+                      role="checkbox"
+                      aria-checked={isSelected}
+                      tabIndex={0}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        toggleTenModule(course.title);
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === " " || e.key === "Enter") {
+                          e.preventDefault();
+                          toggleTenModule(course.title);
+                        }
+                      }}
+                      className={`group relative flex w-full cursor-pointer items-center gap-3.5 rounded-xl border px-4 py-3.5 text-left transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary/40 select-none ${isSelected
+                          ? "border-primary bg-primary/5 shadow-sm ring-1 ring-primary/30"
+                          : "border-border/70 bg-card hover:border-primary/40 hover:bg-accent/40"
+                        }`}
+                    >
+                      <div
+                        className={`h-5 w-5 shrink-0 rounded-md border flex items-center justify-center transition-colors ${
+                          isSelected
+                            ? "bg-primary border-primary text-primary-foreground"
+                            : "border-input bg-background group-hover:border-primary/50"
+                        }`}
+                      >
+                        {isSelected && <Check className="h-3.5 w-3.5 text-primary-foreground stroke-[3]" />}
                       </div>
-                    </AccordionContent>
-                  </AccordionItem>
-                ))}
-              </Accordion>
+                      <span
+                        className={`font-semibold text-base leading-snug transition-colors min-w-0 flex-1 ${isSelected ? "text-primary font-bold" : "text-foreground group-hover:text-primary/90"
+                          }`}
+                      >
+                        {course.title}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
             </CardContent>
           </Card>
 
@@ -370,9 +427,9 @@ export default function SemiconductorSkillTraining() {
               <CardTitle className="text-xl">Remarks / Feedback</CardTitle>
             </CardHeader>
             <CardContent className="pt-8">
-              <Textarea 
+              <Textarea
                 name="remarks"
-                placeholder="Write your feedback, comments or additional requirements..." 
+                placeholder="Write your feedback, comments or additional requirements..."
                 className="min-h-[120px] resize-y bg-background"
               />
             </CardContent>
@@ -412,9 +469,9 @@ export default function SemiconductorSkillTraining() {
 
           {/* Submit Button */}
           <div className="flex justify-center pt-8">
-            <Button 
-              type="submit" 
-              size="lg" 
+            <Button
+              type="submit"
+              size="lg"
               disabled={loading}
               className="relative overflow-hidden group w-full max-w-sm rounded-full bg-primary hover:bg-indigo-glow shadow-xl shadow-primary/25 transition-all hover:-translate-y-1 h-14"
             >
@@ -443,8 +500,8 @@ export default function SemiconductorSkillTraining() {
             <p className="text-muted-foreground mb-8">
               Thank you for registering for the Semiconductor Skill Training Program. Your registration has been received successfully. Our team will contact you soon.
             </p>
-            <Button 
-              onClick={() => setStatus("idle")} 
+            <Button
+              onClick={() => setStatus("idle")}
               className="w-full h-12 rounded-full font-semibold"
             >
               Close

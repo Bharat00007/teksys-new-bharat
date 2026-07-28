@@ -1,8 +1,6 @@
 import { useState } from "react";
-import { GraduationCap, Globe2, ShieldCheck, Users } from "lucide-react";
-import classroom from "@/assets/training-classroom.jpg";
 import { COURSES } from "@/lib/site";
-import { Section, SectionTitle, SectionEyebrow } from "@/components/site/Section";
+import { Section, SectionTitle } from "@/components/site/Section";
 import { ContactForm } from "@/components/site/ContactForm";
 
 function TrainingPage() {
@@ -11,42 +9,16 @@ function TrainingPage() {
   return (
     <>
       <section className="relative isolate overflow-hidden bg-hero-radial text-white">
-        <div className="mx-auto grid max-w-7xl gap-10 px-4 py-20 sm:px-6 lg:grid-cols-2 lg:items-center lg:px-8">
-          <div>
-            <SectionEyebrow>Training Academy</SectionEyebrow>
-            <h1 className="mt-4 text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
-              Semiconductor Skill <span className="text-gradient-brand">Training Academy</span>
-            </h1>
-            <p className="mt-5 max-w-xl text-white/75">
-              Industry-led programs designed by practitioners — covering materials, devices,
-              fabrication, RF/MMIC, power electronics and advanced semiconductor systems.
-            </p>
-            <div className="mt-7 grid gap-3 sm:grid-cols-2">
-              {[
-                { i: ShieldCheck, t: "Industry Expert Faculty" },
-                { i: GraduationCap, t: "Hands-on Labs & Projects" },
-                { i: Globe2, t: "Global Certification with TechDataX" },
-                { i: Users, t: "Placement Assistance" },
-              ].map((x) => (
-                <span key={x.t} className="flex items-center gap-2 rounded-xl border border-white/15 bg-white/[0.04] px-3 py-2 text-sm">
-                  <x.i className="h-4 w-4 text-indigo-glow" /> {x.t}
-                </span>
-              ))}
-            </div>
-            <p className="mt-6 text-xs uppercase tracking-widest text-white/60">
-              Who can join: Engineering Students · Faculty · Researchers · Working Professionals · Industry Experts
-            </p>
-          </div>
-          <div className="relative">
-            <img
-              src={classroom}
-              alt="TEKSYS semiconductor training classroom"
-              className="glow-ring rounded-3xl object-cover"
-              width={1400}
-              height={900}
-              loading="lazy"
-            />
-          </div>
+        <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8 text-center">
+          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
+            Semiconductor Skill Training Academy
+          </h1>
+          <p className="mt-4 text-lg font-medium tracking-wide text-white/85 sm:text-xl lg:text-2xl max-w-3xl mx-auto leading-relaxed">
+            Certification with Global Companies –{" "}
+            <span className="text-gradient-brand font-semibold">Singapore</span> |{" "}
+            <span className="text-gradient-brand font-semibold">USA</span> |{" "}
+            <span className="text-gradient-brand font-semibold">India</span>
+          </p>
         </div>
       </section>
 

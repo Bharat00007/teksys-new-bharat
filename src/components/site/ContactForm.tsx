@@ -15,10 +15,10 @@ type ContactInput = {
   phone?: string;
   company?: string;
   subject?: string;
-  topic?: string;
   message: string;
-  source: "contact" | "enroll" | "service";
 };
+
+type ContactResponse = { ok: true } | { ok: false; error: string };
 
 export function ContactForm({ source = "contact", topic, compact, title }: Props) {
   const formRef = useRef<HTMLFormElement>(null);
@@ -36,9 +36,7 @@ export function ContactForm({ source = "contact", topic, compact, title }: Props
       phone: String(fd.get("phone") || "") || undefined,
       company: String(fd.get("company") || "") || undefined,
       subject: String(fd.get("subject") || "") || undefined,
-      topic: topic || String(fd.get("topic") || "") || undefined,
       message: String(fd.get("message") || ""),
-      source: source as "contact" | "enroll" | "service",
     };
 
     try {
@@ -50,7 +48,7 @@ export function ContactForm({ source = "contact", topic, compact, title }: Props
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ data: payload }),
+        body: JSON.stringify(payload),
       });
 
       const contentType = response.headers.get("content-type") || "";
@@ -58,10 +56,10 @@ export function ContactForm({ source = "contact", topic, compact, title }: Props
         const body = (await response.text()).slice(0, 200);
         throw new Error(`The contact API returned ${contentType || "an unknown content type"} (HTTP ${response.status}) instead of JSON.${body ? ` Response starts: ${body}` : ""}`);
       }
-      const result = await response.json();
-      if (!response.ok) {
+      const result: ContactResponse = await response.json();
+      if (!response.ok || !result.ok) {
         setStatus("error");
-        setError(result.message || result.error || "Something went wrong. Please try again.");
+        setError(result.ok ? "Something went wrong. Please try again." : result.error);
         return;
       }
       setStatus("success");
