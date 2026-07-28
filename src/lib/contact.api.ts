@@ -1,137 +1,137 @@
 import { z } from "zod";
-import { promises as fs } from "fs";
-import path from "path";
 import { sendEmail } from "./mailer";
 
 const ContactSchema = z.object({
-  name: z.string().trim().min(2, "Please enter your name"),
-  email: z.string().trim().email("Invalid email address"),
+  name: z
+    .string()
+    .trim()
+    .min(2, "Please enter your name")
+    .max(120, "Name must be 120 characters or fewer"),
+  email: z.string().trim().email("Please enter a valid email address"),
   phone: z.string().trim().optional(),
   company: z.string().trim().optional(),
   subject: z.string().trim().optional(),
-  topic: z.string().trim().optional(),
-  message: z.string().trim().min(5, "Message must be at least 5 characters"),
-  source: z.string().optional()
-});
+  message: z.string().trim().min(2, "Message must be at least 2 characters"),
+}).strict();
 
-function esc(s: string) {
-  if (!s) return "";
-  const map: Record<string, string> = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
-  return s.replace(/[&<>"']/g, (c) => map[c] || c);
+export type ContactPayload = z.infer<typeof ContactSchema>;
+export type ContactResponse = { ok: true } | { ok: false; error: string };
+
+const jsonHeaders = { "Content-Type": "application/json" };
+
+function json(body: ContactResponse, status: number): Response {
+  return new Response(JSON.stringify(body), { status, headers: jsonHeaders });
 }
 
-const DATA_DIR = process.env.FAILED_CONTACT_DIR ? path.resolve(process.cwd(), process.env.FAILED_CONTACT_DIR) : path.resolve(process.cwd(), "data");
-const FAILED_CONTACT_FILE = path.join(DATA_DIR, "failed-contacts.json");
+function escapeHtml(value: string | undefined): string {
+  return (value || "").replace(/[&<>"']/g, (character) => {
+    const entities: Record<string, string> = {
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;",
+    };
+    return entities[character];
+  });
+}
 
-async function persistFailedContact(entry: any) {
-  try {
-    await fs.mkdir(DATA_DIR, { recursive: true });
-    let list: any[] = [];
-    try {
-      const txt = await fs.readFile(FAILED_CONTACT_FILE, "utf-8");
-      list = JSON.parse(txt || "[]");
-    } catch (e) {
-      list = [];
-    }
-    list.push(entry);
-    await fs.writeFile(FAILED_CONTACT_FILE, JSON.stringify(list, null, 2), "utf-8");
-    console.log("[CONTACT API] Persisted failed contact to", FAILED_CONTACT_FILE);
-  } catch (err) {
-    console.error("[CONTACT API] Failed to persist contact:", err);
-  }
+function renderAdminEmail(data: ContactPayload): string {
+  const rows = [
+    ["Name", data.name],
+    ["Email", data.email],
+    ["Phone", data.phone || "Not provided"],
+    ["Company", data.company || "Not provided"],
+    ["Subject", data.subject || "Not provided"],
+  ];
+
+  return `
+    <div style="font-family:Arial,sans-serif;max-width:640px;margin:auto">
+      <h2>New contact form submission</h2>
+      <table style="width:100%;border-collapse:collapse">
+        <tbody>
+          ${rows
+            .map(
+              ([label, value]) => `
+                <tr>
+                  <td style="padding:8px;border:1px solid #ddd;font-weight:700">${escapeHtml(label)}</td>
+                  <td style="padding:8px;border:1px solid #ddd">${escapeHtml(value)}</td>
+                </tr>`,
+            )
+            .join("")}
+        </tbody>
+      </table>
+      <h3 style="margin-top:24px">Message</h3>
+      <div style="white-space:pre-wrap;padding:16px;border-left:4px solid #2a18b0;background:#f6f6f8">${escapeHtml(data.message)}</div>
+    </div>`;
+}
+
+function renderAutoReply(data: ContactPayload): string {
+  return `
+    <div style="font-family:Arial,sans-serif;max-width:640px;margin:auto">
+      <h2>Thank you for contacting TEKSYS</h2>
+      <p>Hi ${escapeHtml(data.name)},</p>
+      <p>We have received your message and will respond within 1–2 business days.</p>
+      <h3>Your message</h3>
+      <div style="white-space:pre-wrap;padding:16px;border-left:4px solid #2a18b0;background:#f6f6f8">${escapeHtml(data.message)}</div>
+      <p>Regards,<br />TEKSYS Team</p>
+    </div>`;
+}
+
+function hasRequiredSmtpConfig(): boolean {
+  return Boolean(
+    process.env.SMTP_SERVER?.trim() &&
+      process.env.SMTP_PORT?.trim() &&
+      process.env.EMAIL_PASSWORD?.trim(),
+  );
 }
 
 export async function handleContactAPI(request: Request): Promise<Response> {
-  console.log("\n[CONTACT API] ====== Incoming request ======");
+  if (request.method !== "POST") {
+    return json({ ok: false, error: "Method not allowed." }, 405);
+  }
 
   try {
-    const body = await request.json();
-    console.log("[CONTACT API] Parsed body keys:", Object.keys(body));
-
-    const parsed = ContactSchema.safeParse(body.data);
+    const payload: unknown = await request.json();
+    const parsed = ContactSchema.safeParse(payload);
 
     if (!parsed.success) {
-      const errorMsg = parsed.error.issues[0]?.message || "Invalid form data";
-      console.error("[CONTACT API] Validation failed:", errorMsg);
-      return new Response(JSON.stringify({ success: false, message: errorMsg }), {
-        status: 400,
-        headers: { "Content-Type": "application/json" }
-      });
+      return json(
+        { ok: false, error: parsed.error.issues[0]?.message || "Invalid form data." },
+        400,
+      );
     }
 
     const data = parsed.data;
-    const admin = process.env.ADMIN_EMAIL || "admin@teksys-services.com";
-    console.log("[CONTACT API] Sending to admin:", admin);
+    if (!hasRequiredSmtpConfig()) {
+      return json({ ok: false, error: "Email service is not configured." }, 500);
+    }
 
-    const html = `
-      <div style="font-family:Inter,Arial,sans-serif;max-width:600px;margin:auto">
-        <h2 style="color:#2a18b0; border-bottom: 2px solid #eee; padding-bottom: 10px;">New Contact Form Submission</h2>
-        <table style="width:100%;border-collapse:collapse" cellpadding="8">
-          <tr><td style="width:160px;"><b>Name:</b></td><td>${esc(data.name)}</td></tr>
-          <tr><td><b>Email:</b></td><td>${esc(data.email)}</td></tr>
-          <tr><td><b>Phone:</b></td><td>${data.phone ? esc(data.phone) : "N/A"}</td></tr>
-          <tr><td><b>Company/Institute:</b></td><td>${data.company ? esc(data.company) : "N/A"}</td></tr>
-          <tr><td><b>Subject:</b></td><td>${data.subject ? esc(data.subject) : "N/A"}</td></tr>
-          <tr><td><b>Topic:</b></td><td>${data.topic ? esc(data.topic) : "N/A"}</td></tr>
-          <tr><td><b>Source:</b></td><td>${data.source ? esc(data.source) : "N/A"}</td></tr>
-        </table>
-        
-        <h3 style="margin-top:24px; color:#2a18b0; border-bottom: 1px solid #eee; padding-bottom: 8px;">Message</h3>
-        <p style="white-space:pre-wrap;background:#f9fafb;padding:16px;border-radius:8px; border: 1px solid #e5e7eb;">${esc(data.message)}</p>
-      </div>
-    `;
-
-    const textContent = `
-New Contact Form Submission
-
-Name: ${data.name}
-Email: ${data.email}
-Phone: ${data.phone || "N/A"}
-Company/Institute: ${data.company || "N/A"}
-Subject: ${data.subject || "N/A"}
-Topic: ${data.topic || "N/A"}
-Source: ${data.source || "N/A"}
-
-Message:
-${data.message}
-`;
-
-    const result = await sendEmail({
-      to: admin,
-      subject: `New Contact Form Submission from ${data.name}`,
-      html: html,
-      text: textContent,
+    const senderAddress = process.env.EMAIL_ADDRESS || process.env.SMTP_USER;
+    const adminResult = await sendEmail({
+      to: process.env.ADMIN_EMAIL || senderAddress || "",
+      subject: `New contact form submission from ${data.name}`,
+      html: renderAdminEmail(data),
       replyTo: data.email,
     });
 
-    if (!result.success) {
-      console.error("[CONTACT API] Email sending failed:", result.error);
-      await persistFailedContact({ timestamp: new Date().toISOString(), data, error: result.error });
-      return new Response(JSON.stringify({
-        success: true,
-        message: "Message submitted successfully. Our team will follow up shortly."
-      }), {
-        status: 200,
-        headers: { "Content-Type": "application/json" }
-      });
+    if (!adminResult.success) {
+      return json({ ok: false, error: "Email failed to send." }, 500);
     }
 
-    console.log("[CONTACT API] Contact processed successfully");
-    return new Response(JSON.stringify({
-      success: true,
-      message: "Message sent successfully."
-    }), {
-      status: 200,
-      headers: { "Content-Type": "application/json" }
-    });
+    try {
+      await sendEmail({
+        to: data.email,
+        subject: "We received your message",
+        html: renderAutoReply(data),
+      });
+    } catch {
+      // The user's confirmation email must not affect a successful submission.
+    }
+
+    return json({ ok: true }, 200);
   } catch (error: any) {
     console.error("[CONTACT API] Unhandled error:", error);
-    return new Response(JSON.stringify({
-      success: false,
-      message: error?.message || "Internal server error"
-    }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" }
-    });
+    return json({ ok: false, error: "Unable to process your message." }, 500);
   }
 }

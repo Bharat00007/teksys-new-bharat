@@ -35,7 +35,8 @@ const apiPlugin = () => ({
           } catch (e) {
             console.error("API error:", e);
             res.statusCode = 500;
-            res.end(JSON.stringify({ error: "Internal Error" }));
+            res.setHeader("Content-Type", "application/json");
+            res.end(JSON.stringify({ ok: false, error: "Internal server error." }));
           }
         });
         return;

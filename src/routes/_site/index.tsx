@@ -44,54 +44,203 @@ function Home() {
   );
 }
 
+/* ── Floating mini-card data ── */
+const HERO_CHIPS = [
+  { label: "GaN", icon: Zap },
+  { label: "MMIC", icon: Cpu },
+  { label: "SiC", icon: Layers },
+  { label: "Training", icon: GraduationCap },
+] as const;
+
+const TRUST_ITEMS = [
+  "Semiconductor Skill Training",
+  "Engineering Services",
+  "Defence Technology",
+  "Singapore Based",
+];
+
+/* ── Circuit-pattern SVG (inline, lightweight) ── */
+const CircuitPattern = () => (
+  <svg
+    className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.03]"
+    xmlns="http://www.w3.org/2000/svg"
+    aria-hidden
+  >
+    <defs>
+      <pattern id="hero-circuit" x="0" y="0" width="120" height="120" patternUnits="userSpaceOnUse">
+        <line x1="0" y1="30" x2="50" y2="30" stroke="currentColor" strokeWidth="1" />
+        <line x1="70" y1="30" x2="120" y2="30" stroke="currentColor" strokeWidth="1" />
+        <line x1="0" y1="90" x2="40" y2="90" stroke="currentColor" strokeWidth="1" />
+        <line x1="80" y1="90" x2="120" y2="90" stroke="currentColor" strokeWidth="1" />
+        <line x1="60" y1="0" x2="60" y2="25" stroke="currentColor" strokeWidth="1" />
+        <line x1="60" y1="35" x2="60" y2="85" stroke="currentColor" strokeWidth="1" />
+        <line x1="60" y1="95" x2="60" y2="120" stroke="currentColor" strokeWidth="1" />
+        <circle cx="60" cy="30" r="3.5" fill="none" stroke="currentColor" strokeWidth="1" />
+        <circle cx="60" cy="90" r="3.5" fill="none" stroke="currentColor" strokeWidth="1" />
+        <rect x="38" y="88" width="4" height="4" rx="1" fill="currentColor" opacity="0.6" />
+        <rect x="78" y="28" width="4" height="4" rx="1" fill="currentColor" opacity="0.6" />
+      </pattern>
+    </defs>
+    <rect width="100%" height="100%" fill="url(#hero-circuit)" />
+  </svg>
+);
+
 function Hero() {
   return (
-    <section className="relative bg-background">
-      <div className="mx-auto grid max-w-7xl gap-10 px-4 pb-12 pt-12 sm:px-6 lg:grid-cols-2 lg:gap-12 lg:px-8 lg:pb-20 lg:pt-20">
-        <div className="flex flex-col justify-center">
+    <section className="hero-section relative isolate overflow-hidden bg-background">
+      {/* ── Background layers ── */}
+      <CircuitPattern />
+      <div
+        className="pointer-events-none absolute -right-40 -top-40 h-[600px] w-[600px] rounded-full opacity-[0.08]"
+        style={{ background: "radial-gradient(circle, var(--brand-indigo-glow), transparent 70%)" }}
+        aria-hidden
+      />
+      <div
+        className="pointer-events-none absolute -bottom-32 -left-32 h-[500px] w-[500px] rounded-full opacity-[0.06]"
+        style={{ background: "radial-gradient(circle, var(--brand-cyan), transparent 70%)" }}
+        aria-hidden
+      />
+
+      {/* ── Content ── */}
+      <div className="mx-auto grid max-w-7xl gap-8 px-4 py-12 sm:px-6 lg:grid-cols-2 lg:items-start lg:gap-10 lg:px-8 lg:py-16">
+        {/* ═══ LEFT ═══ */}
+        <div className="flex flex-col justify-start text-center lg:text-left">
           <motion.h1
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, ease: "easeOut" }}
-            className="text-[2rem] font-extrabold leading-[1.15] tracking-tight text-foreground drop-shadow-sm sm:text-[2.5rem] lg:text-[3rem] lg:leading-[1.1]"
+            className="mx-auto max-w-[580px] font-display text-[2rem] font-[850] leading-[1.08] tracking-[-0.025em] text-ink sm:text-[2.75rem] lg:mx-0 lg:text-[3.35rem]"
           >
-            Semiconductor, Defence &amp; Advanced Technology Solutions
+            Semiconductor, Defence &amp; Advanced Technology Innovation and Solutions
           </motion.h1>
+
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
-            className="mt-6 max-w-xl text-lg leading-relaxed text-foreground/80"
+            transition={{ duration: 0.8, ease: "easeOut", delay: 0.15 }}
+            className="mx-auto mt-5 max-w-[500px] text-[0.95rem] leading-[1.7] text-foreground/65 sm:text-base lg:mx-0"
           >
             Supporting Industry, Academia, Startups &amp; Government Organizations Through{" "}
             <span className="font-semibold text-primary">Semiconductor Skill Training</span>,{" "}
             <span className="font-medium text-foreground">Technology Computing</span>,{" "}
             <span className="font-medium text-foreground">Engineering Services</span> &amp;{" "}
-            <span className="font-medium text-foreground">Workforce Development</span>
+            <span className="font-medium text-foreground">Workforce Development</span>.
           </motion.p>
+
+          {/* Buttons */}
+          <motion.div
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.75, ease: "easeOut", delay: 0.28 }}
+            className="mx-auto mt-7 flex flex-wrap items-center justify-center gap-4 lg:mx-0 lg:justify-start"
+          >
+            <Link
+              to="/contact"
+              className="inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3.5 text-sm font-bold uppercase tracking-wide text-primary-foreground shadow-[0_4px_24px_-4px_var(--brand-indigo-glow)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_8px_32px_-4px_var(--brand-indigo-glow)]"
+            >
+              Get Started <ArrowRight className="h-4 w-4" />
+            </Link>
+            <Link
+              to="/services"
+              className="inline-flex items-center gap-2 rounded-full border-2 border-ink/15 px-7 py-3.5 text-sm font-bold uppercase tracking-wide text-foreground transition-all duration-300 hover:border-primary hover:text-primary"
+            >
+              Explore Services
+            </Link>
+          </motion.div>
+
+          {/* Trust badges */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, ease: "easeOut", delay: 0.4 }}
+            className="mx-auto mt-8 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 lg:mx-0 lg:justify-start"
+          >
+            {TRUST_ITEMS.map((item, i) => (
+              <span key={item} className="flex items-center gap-1.5 text-[0.8rem] font-medium text-foreground/60">
+                {i > 0 && (
+                  <span className="mr-1 hidden h-3.5 w-px bg-foreground/15 sm:inline-block" aria-hidden />
+                )}
+                <CheckCircle2 className="h-3.5 w-3.5 text-primary/80" />
+                {item}
+              </span>
+            ))}
+          </motion.div>
         </div>
 
-        <motion.div
-          initial={{ opacity: 0, scale: 0.97 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.7, delay: 0.15 }}
-          className="grid grid-cols-2 gap-4"
-        >
-          <HeroCard
-            img={collageGan}
-            title="GaN Technology, Fabless & MMIC Design and Development"
-            position="bottom"
-            className="col-span-2 aspect-[16/7]"
-            imgClassName="object-[center_75%]"
+        {/* ═══ RIGHT — Premium visual showcase ═══ */}
+        <div className="relative flex items-start justify-center pt-0 lg:pt-1">
+          {/* Glow behind card */}
+          <div
+            className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[80%] w-[80%] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-[0.12] blur-[80px]"
+            style={{ background: "radial-gradient(circle, var(--brand-indigo-glow), transparent 70%)" }}
+            aria-hidden
           />
-          <HeroCard
-            img={collageTraining}
-            title="Semiconductor Skill Training on GaN and SiC "
-            position="bottom"
-            className="col-span-2 aspect-[16/7]"
-          />
-        </motion.div>
+
+          {/* Main showcase card */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.96 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, ease: "easeOut", delay: 0.1 }}
+            className="hero-float relative w-full max-w-[480px] overflow-hidden rounded-3xl border border-white/60 bg-white/70 p-2.5 shadow-[0_8px_60px_-12px_rgba(0,0,0,0.12),0_0_0_1px_rgba(255,255,255,0.6)_inset] backdrop-blur-sm"
+            style={{ borderColor: "color-mix(in oklab, var(--brand-indigo) 12%, rgba(255,255,255,0.5))" }}
+          >
+            {/* Top image – GaN */}
+            <div className="group relative overflow-hidden rounded-2xl">
+              <img
+                src={collageGan}
+                alt="GaN Technology, Fabless & MMIC Design and Development"
+                className="aspect-[16/8] w-full object-cover object-[center_75%] transition-transform duration-700 group-hover:scale-105"
+                loading="eager"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-ink/50 via-transparent to-transparent" />
+              <p className="absolute bottom-3 left-4 text-sm font-bold text-white drop-shadow-md">
+                GaN Technology, Fabless &amp; MMIC Design
+              </p>
+            </div>
+
+            {/* Bottom image – Training */}
+            <div className="group relative mt-2.5 overflow-hidden rounded-2xl">
+              <img
+                src={collageTraining}
+                alt="Semiconductor Skill Training on GaN and SiC"
+                className="aspect-[16/8] w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                loading="eager"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-ink/50 via-transparent to-transparent" />
+              <p className="absolute bottom-3 left-4 text-sm font-bold text-white drop-shadow-md">
+                Semiconductor Skill Training
+              </p>
+            </div>
+          </motion.div>
+
+          {/* ── Floating mini-cards ── */}
+          {HERO_CHIPS.map((chip, i) => {
+            const positions = [
+              "left-0 top-2 -translate-x-1/3 lg:-translate-x-1/2",
+              "right-0 top-12 translate-x-1/3 lg:translate-x-1/2",
+              "left-1 bottom-14 -translate-x-1/3 lg:-translate-x-1/2",
+              "right-0 bottom-4 translate-x-1/3 lg:translate-x-1/2",
+            ];
+            const ChipIcon = chip.icon;
+            return (
+              <motion.div
+                key={chip.label}
+                initial={{ opacity: 0, y: 16, scale: 0.9 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ duration: 0.6, delay: 0.35 + i * 0.1 }}
+                className={`absolute z-10 hidden items-center gap-2 rounded-xl border border-white/50 bg-white/80 px-3.5 py-2.5 text-xs font-bold text-ink shadow-lg backdrop-blur-md transition-transform duration-300 hover:scale-110 sm:flex ${positions[i]}`}
+                style={{ borderColor: "color-mix(in oklab, var(--brand-indigo) 10%, rgba(255,255,255,0.6))" }}
+              >
+                <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/10">
+                  <ChipIcon className="h-3.5 w-3.5 text-primary" />
+                </span>
+                {chip.label}
+              </motion.div>
+            );
+          })}
+        </div>
       </div>
+
       <img src={hero} alt="" className="hidden" aria-hidden />
     </section>
   );
